@@ -2,6 +2,9 @@ const cTable = require('console.table');
 const inquirer = require("inquirer");
 const mysql = require('mysql2');
 require('dotenv').config();
+const Employee = require("./lib/Employee")
+const Department = require("./lib/Department")
+const Role = require("./lib/Role")
 
 const db = mysql.createConnection(
     {
