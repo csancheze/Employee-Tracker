@@ -106,9 +106,9 @@ const showByManager = (managerId) => {
     });
 }
 
-const showByDepartment = (departmentName) => {
-    const sql = 'SELECT * FROM employee JOIN roles ON employee.role_id = roles.id JOIN employee ON employee.manager_id = employee.id WHERE department_name = ?';
-    const params = departmentName
+const showByDepartment = (departmentId) => {
+    const sql = 'SELECT * FROM employee JOIN roles ON employee.role_id = roles.id JOIN employee ON employee.manager_id = employee.id WHERE department_id = ?';
+    const params = departmentId
     db.query(sql,params,(err, result) => {
         console.log(result);
         if (err) {
@@ -167,3 +167,4 @@ const deleteEmployee = (employeeId) => {
     showEmployees();
 }
 
+module.exports = { addDepartment,addEmployee, addRole,updateManager ,showByDepartment, showByManager, showDepartments, showEmployees, showRoles, deleteEmployee, deleteDepartment, deleteRoles };
