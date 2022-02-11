@@ -77,7 +77,7 @@ const addEmployee = (newEmployee) => {
 }
 
 const updateManager = (newInfo) => {
-    const sql = ' UPDATE employee SET manager_id = ? id = ?';
+    const sql = ' UPDATE employee SET manager_id = ? WHERE id = ?';
     const params = newInfo;
 
     db.query(sql,params,(err, result) => {
