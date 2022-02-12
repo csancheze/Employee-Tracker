@@ -2,7 +2,7 @@ const cTable = require('console.table');
 const inquirer = require("inquirer");
 const mysql = require('mysql2');
 require('dotenv').config();
-const { showBudgetByDepartment, addDepartment, addEmployee, addRole, updateManager ,showByDepartment, showByManager, showDepartments, showEmployees, showRoles, deleteEmployee, deleteDepartment, deleteRoles } = require('./queries/query.js')
+const { updateRole, showBudgetByDepartment, addDepartment, addEmployee, addRole, updateManager ,showByDepartment, showByManager, showDepartments, showEmployees, showRoles, deleteEmployee, deleteDepartment, deleteRoles } = require('./queries/query.js')
 
 
 const startApp = () => {
@@ -13,7 +13,7 @@ const startApp = () => {
             type: "list",
             message: "What do you want to do?",
 
-            choices: ["View","Add","Delete", "Update Manager", "Show budget by department", "Exit"]
+            choices: ["View","Add","Delete","Update Role","Update Manager", "Show budget by department", "Exit"]
         }
             
     ])
@@ -25,7 +25,9 @@ const startApp = () => {
         } else if (answer.menu == "Delete") {
             deleteInfo();
         } else if (answer.menu == "Update Manager") {
-            inquirerUpManager(); 
+            inquirerUpManager();
+        } else if (answer.menu == "Update Role") {
+            inquirerUpRole();     
         } else if (answer.menu == "Show budget by department") {
             showBudget();         
         }else {
@@ -385,6 +387,43 @@ const inquirerUpManager = () => {
             
 }
 
+const inquirerUpRole = () => {
+    showRoles()
+    showEmployees();
+    inquirer
+            .prompt([
+                {
+                    name: "employee",
+                    type: "input",
+                    message: "Enter the employee id that you want to update",
+                    validate(answer) { 
+                        valid = /^[0-9]+$/.test(answer)
+                        if(!valid) {
+                        return "Please, write a number!"
+                    }
+                    return true
+                    }
+                },
+                {
+                    name: "role",
+                    type: "input",
+                    message: "Enter the new role id.",
+                    validate(answer) { 
+                        valid = /^[0-9]+$/.test(answer)
+                        if(!valid) {
+                        return "Please, write a number!"
+                    }
+                    return true
+                    }
+                }
+                    
+            ])
+            .then((answer) =>{
+                updateRole([answer.role,answer.employee]);
+                startApp();
+            })
+            
+}
 const showBudget = () => {
     showDepartments();
     inquirer

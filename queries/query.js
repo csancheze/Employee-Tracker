@@ -213,4 +213,23 @@ const showBudgetByDepartment = (departmentId) => {
     });
 }
 
-module.exports = { addDepartment,addEmployee, addRole,updateManager ,showByDepartment, showByManager, showDepartments, showEmployees, showRoles, deleteEmployee, deleteDepartment, deleteRoles, showBudgetByDepartment };
+const updateRole = (newInfo) => {
+    const sql = ' UPDATE employee SET role_id = ? WHERE id = ?';
+    const params = newInfo;
+
+    db.query(sql,params,(err, result) => {
+        if (err) {
+            console.log('\n')
+            console.log(err.message);
+        } else if (!result.affectedRows) {
+            console.log('\n')
+            console.log("Employee not found")
+        } else {
+            console.log('\n')
+            showEmployees();
+        }
+    });
+}
+
+
+module.exports = { updateRole,addDepartment,addEmployee, addRole,updateManager ,showByDepartment, showByManager, showDepartments, showEmployees, showRoles, deleteEmployee, deleteDepartment, deleteRoles, showBudgetByDepartment };
