@@ -2,24 +2,10 @@ const cTable = require('console.table');
 const inquirer = require("inquirer");
 const mysql = require('mysql2');
 require('dotenv').config();
-const Employee = require("./lib/Employee")
-const Department = require("./lib/Department")
-const Role = require("./lib/Role")
-const { addDepartment,addEmployee, addRole,updateManager ,showByDepartment, showByManager, showDepartments, showEmployees, showRoles, deleteEmployee, deleteDepartment, deleteRoles } = require('./queries/query.js')
+const { showBudgetByDepartment, addDepartment, addEmployee, addRole, updateManager ,showByDepartment, showByManager, showDepartments, showEmployees, showRoles, deleteEmployee, deleteDepartment, deleteRoles } = require('./queries/query.js')
 
-const db = mysql.createConnection(
-    {
-      host: 'localhost',
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME
-    },
-    console.log(`Connected to the database.`)
-);
-  
 
 const startApp = () => {
-    console.log('\x1b[32m%s\x1b[0m','Welcome to the employee tracker!')
     inquirer
     .prompt([
         {
@@ -27,7 +13,7 @@ const startApp = () => {
             type: "list",
             message: "What do you want to do?",
 
-            choices: ["View","Add","Delete", "Update Manager", "Exit"]
+            choices: ["View","Add","Delete", "Update Manager", "Show budget by department", "Exit"]
         }
             
     ])
@@ -39,9 +25,12 @@ const startApp = () => {
         } else if (answer.menu == "Delete") {
             deleteInfo();
         } else if (answer.menu == "Update Manager") {
-            inquirerUpManager();            
+            inquirerUpManager(); 
+        } else if (answer.menu == "Show budget by department") {
+            showBudget();         
         }else {
-            return
+            console.log('\x1b[32m%s\x1b[0m','Bye!')
+            process.exit();
         }
     })
 }
@@ -68,13 +57,11 @@ const view = () => {
             view();
         } else if (answer.menu == "Employees") {
             employees();
-            view();
        }else {
             startApp();
         }
     })
-
-}
+}   
 
 const employees = () => {
     showEmployees();
@@ -109,8 +96,9 @@ const employees = () => {
             ])
             .then((answer) =>{
                 showByManager([answer.id]);
+                employees();
             })
-            employees();
+            
         } else if (answer.menu == "Employees by Department") {
             showDepartments();
             inquirer
@@ -130,9 +118,10 @@ const employees = () => {
             ])
             .then((answer) =>{
                 showByDepartment([answer.id]);
+                employees();
             })
-            employees();
-        }else {
+            
+        } else {
             view();
             }
         })
@@ -152,6 +141,7 @@ const add = () => {
             
     ])
     .then((answer) =>{
+        showDepartments();
         if (answer.menu == "Department") {
             inquirer
             .prompt([
@@ -168,9 +158,11 @@ const add = () => {
             ])
             .then((answer) =>{
                 addDepartment([answer.departmentName]);
+                add();
             })
-            add();
+            
         } else if (answer.menu == "Role") {
+            showRoles();
             inquirer
             .prompt([
                 {
@@ -208,9 +200,12 @@ const add = () => {
             ])
             .then((answer) =>{
                 addRole([answer.title,answer.salary,answer.departmentId]);
+                add();
             })
-            add();
+            
         } else if (answer.menu == "Employee") {
+            showEmployees();
+            console.log('\x1b[32m%s\x1b[0m','Please add/update managers first!')
             inquirer
             .prompt([
                 {
@@ -248,7 +243,41 @@ const add = () => {
                 {
                     name: "managerId",
                     type: "input",
-                    message: "Enter the manager id.",
+                    message: "Enter the manager id. Leave empty if manager.",             
+                }           
+            ])
+            .then((answer) =>{
+                addEmployee([answer.firstName,answer.lastName,answer.roleId,answer.managerId]);
+                add(); 
+            })
+               
+        }else {
+            startApp();
+        }
+    })
+}
+
+const deleteInfo = () => {
+    inquirer
+    .prompt([
+        {
+            name: "menu",
+            type: "list",
+            message: "Do you want to delete?",
+
+            choices: ["Employee","Role", "Department","Return"]
+        }
+            
+    ])
+    .then((answer) =>{
+        if (answer.menu == "Employee") {
+            showEmployees();
+            inquirer
+            .prompt([
+                {
+                    name: "id",
+                    type: "input",
+                    message: "Enter the employee id",
                     validate(answer) { 
                         valid = /^[0-9]+$/.test(answer)
                         if(!valid) {
@@ -256,18 +285,129 @@ const add = () => {
                     }
                     return true
                     }
-                }           
+                }
+                    
             ])
             .then((answer) =>{
-                addEmployee([answer.firstName,answer.lastName,answer.roleId,answer.managerId]);
+                deleteEmployee([answer.id]);
+                deleteInfo();
             })
-            add();     
+            
+
+        } else if (answer.menu == "Role") {
+            showRoles();
+          inquirer
+            .prompt([
+                {
+                    name: "id",
+                    type: "input",
+                    message: "Enter the role id",
+                    validate(answer) { 
+                        valid = /^[0-9]+$/.test(answer)
+                        if(!valid) {
+                        return "Please, write a number!"
+                    }
+                    return true
+                    }
+                }
+                    
+            ])
+            .then((answer) =>{
+                deleteRoles([answer.id]);
+                deleteInfo();
+            })
+            
+            
+        } else if (answer.menu == "Department") {
+            showDepartments();
+            inquirer
+              .prompt([
+                  {
+                      name: "id",
+                      type: "input",
+                      message: "Enter the department id",
+                      validate(answer) { 
+                          valid = /^[0-9]+$/.test(answer)
+                          if(!valid) {
+                          return "Please, write a number!"
+                      }
+                      return true
+                      }
+                  }
+                      
+              ])
+              .then((answer) =>{
+                  deleteDepartment([answer.id]);
+                  deleteInfo();
+              })
+              
+              
         }else {
             startApp();
-        }
-    })
+            }
+        })
 }
 
-const 
+const inquirerUpManager = () => {
+    showEmployees();
+    inquirer
+            .prompt([
+                {
+                    name: "employee",
+                    type: "input",
+                    message: "Enter the employee id that you want to update",
+                    validate(answer) { 
+                        valid = /^[0-9]+$/.test(answer)
+                        if(!valid) {
+                        return "Please, write a number!"
+                    }
+                    return true
+                    }
+                },
+                {
+                    name: "manager",
+                    type: "input",
+                    message: "Enter the new manager id.",
+                    validate(answer) { 
+                        valid = /^[0-9]+$/.test(answer)
+                        if(!valid) {
+                        return "Please, write a number!"
+                    }
+                    return true
+                    }
+                }
+                    
+            ])
+            .then((answer) =>{
+                updateManager([answer.manager,answer.employee]);
+                startApp();
+            })
+            
+}
 
+const showBudget = () => {
+    showDepartments();
+    inquirer
+            .prompt([
+                {
+                    name: "id",
+                    type: "input",
+                    message: "Enter the department id",
+                    validate(answer) { 
+                        valid = /^[0-9]+$/.test(answer)
+                        if(!valid) {
+                        return "Please, write a number!"
+                    }
+                    return true
+                    }
+                }
+                    
+            ])
+            .then((answer) =>{
+                showBudgetByDepartment([answer.id]);
+                startApp();
+            })
+}
+
+console.log('\x1b[32m%s\x1b[0m','Welcome to the employee tracker!')
 startApp();
