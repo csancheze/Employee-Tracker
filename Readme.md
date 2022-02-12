@@ -3,7 +3,7 @@
   ## Description
   
   
-This is an application to manage a company's employees using a content management system (CMS) built with Inquirer in Node.js using MySQL for the database. It is command-line app so it uses console.table to show the data. It allows to view, add and delete employees, roles and departments. It also has a few other utilites as updating roles and manager, filter employees by manager and department, and view budget for department.
+This is an application to manage a company's employees using a content management system (CMS) built with Inquirer in Node.js using MySQL for the database. It is a command-line app so it uses console.table to show the data. It allows to view, add and delete employees, roles and departments. It also has a few other utilites as updating roles and manager, filter employees by manager and department, and view budget for department.
 
   
   ## Table of Contents
@@ -28,7 +28,7 @@ Run node index.js in the terminal where the file is located. Then use the key ar
 
   
   
-![Employee Tracker webpage working as expected](assets/images/screenshot.png)
+![Employee Tracker webpage working as expected](assets/screenshot.png)
   
   ## License
   
